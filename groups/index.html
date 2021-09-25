@@ -4,12 +4,48 @@
 <head>
   <!-- Include the GoJS library. -->
   <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+
+  <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    li {
+      float: left;
+    }
+
+    li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    li a:hover {
+      background-color: #111;
+    }
+  </style>
+
 </head>
 
 <body>
-  <div id="myDiagramDiv" style="width:100vw; height:100vh"></div>
+  <ul>
+    <li onclick="createGroup('Test Group')"><a>Group</a></li>
+    <!-- <li onclick="createGroup('Vertical')"><a>V-Group</a></li> -->
+    <li onclick="addNode('Page')"><a>Page</a></li>
+    <li onclick="addNode('Logic')"><a>Logic</a></li>
+    <li onclick="addNode('Scene')"><a>Scene</a></li>
+  </ul>
+  <div id="myDiagramDiv" style="width:100vw; height:100vh">
+  </div>
 
 </body>
+
 
 <script>
   var diagram = new go.Diagram("myDiagramDiv");
@@ -21,6 +57,7 @@
 
   var nodeShapes = {
     'Scene': 'M20.9,6.1A13.6,13.6,0,1,1,7.3,19.7,13.6,13.6,0,0,1,20.9,6.1ZM54.1,0A16.6,16.6,0,1,1,37.5,16.6,16.6,16.6,0,0,1,54.1,0ZM88.4,45.1,75.6,52.4V43.7a7.1,7.1,0,0,0-7.1-7.1H7.1A7.1,7.1,0,0,0,0,43.7v42a7.1,7.1,0,0,0,7.1,7.1H68.5a7.1,7.1,0,0,0,7.1-7.1V77l12.7,7.3a4.4,4.4,0,0,0,6.6-3.8V48.9A4.3,4.3,0,0,0,88.4,45.1ZM48.3,66.8,32.5,76.1A2.5,2.5,0,0,1,28.7,74V55.4a2.5,2.5,0,0,1,3.8-2.1l15.8,9.3A2.4,2.4,0,0,1,48.3,66.8Z',
+    'Page': 'M20.9,6.1A13.6,13.6,0,1,1,7.3,19.7,13.6,13.6,0,0,1,20.9,6.1ZM54.1,0A16.6,16.6,0,1,1,37.5,16.6,16.6,16.6,0,0,1,54.1,0ZM88.4,45.1,75.6,52.4V43.7a7.1,7.1,0,0,0-7.1-7.1H7.1A7.1,7.1,0,0,0,0,43.7v42a7.1,7.1,0,0,0,7.1,7.1H68.5a7.1,7.1,0,0,0,7.1-7.1V77l12.7,7.3a4.4,4.4,0,0,0,6.6-3.8V48.9A4.3,4.3,0,0,0,88.4,45.1ZM48.3,66.8,32.5,76.1A2.5,2.5,0,0,1,28.7,74V55.4a2.5,2.5,0,0,1,3.8-2.1l15.8,9.3A2.4,2.4,0,0,1,48.3,66.8Z',
     'User': 'M20.5,7.1c0,3.4-2.8,8.9-6.2,8.9S8.1,10.5,8.1,7.1,9,0,14.3,0,20.5,3.7,20.5,7.1Zm2.4,10.7H21.1a3.4,3.4,0,0,1-3-1.8,5.9,5.9,0,0,1-4,1.8A6.1,6.1,0,0,1,10,16a3.4,3.4,0,0,1-3,1.8H5.3s-3.2.9-5.3,5.4v3.6a1.8,1.8,0,0,0,1.8,1.8H26.4a1.8,1.8,0,0,0,1.7-1.8V23.2C26,18.7,22.9,17.8,22.9,17.8Z',
     'Logic': 'M32.5,17a5.1,5.1,0,0,0,5,5c2.4,0,3.6-1.6,4.4-.6s.5,1.1.5,2.9V34h8.3c1.2,0,1.3-.1,1.4-.3s-.2-1.3-.2-3.1c0-3.8,4-6.8,7.5-6.8s7.5,2.9,7.5,6.8c0,1.8-.4,2.6-.2,3.1s.3.3,1.5.3h8.2V4s.2-2.1-.9-3.1S72.1,0,72.1,0H42.4V9.7c0,1.9,0,2.5-.5,3s-1.9-.6-4.4-.6A5,5,0,0,0,32.5,17ZM0,34H9.7c1.9,0,2.5.1,3,.5s-.6,2-.6,4.5A4.9,4.9,0,0,0,17,43.9,5,5,0,0,0,22,39c0-2.5-1.6-3.7-.6-4.5s1.1-.5,2.9-.5H34V25.8c0-1.2-.1-1.4-.3-1.5s-1.3.2-3.1.2c-3.8,0-6.8-4-6.8-7.5s2.9-7.5,6.8-7.5c1.8,0,2.6.4,3.1.2s.3-.2.3-1.4V0H4.8S2-.2.9.9,0,4.4,0,4.4V34ZM43.9,59.6A4.9,4.9,0,0,0,39,54.7c-2.5,0-3.7,1.6-4.5.6s-.5-1.1-.5-3V42.6H25.8c-1.2,0-1.4.2-1.5.4s.2,1.3.2,3c0,3.8-4,6.9-7.5,6.9S9.5,50,9.5,46c0-1.7.4-2.5.2-3s-.2-.4-1.4-.4H0V72s0,2.4,1,3.5,3.5,1.2,3.5,1.2H34V67c0-1.9.1-2.5.5-3s2,.6,4.5.6A4.9,4.9,0,0,0,43.9,59.6ZM77.6,89.1,98.5,68.3l-6.9-6.8c-1.3-1.4-1.7-1.9-1.7-2.5s1.8-1,3.5-2.7a4.8,4.8,0,0,0,0-7,4.9,4.9,0,0,0-6.9,0C84.7,51,85,53,83.7,52.9s-1.1-.5-2.4-1.8l-6.9-6.9-5.8,5.9c-.8.8-.9,1-.8,1.3s1.1.7,2.3,2c2.7,2.7,2,7.6-.5,10.1s-7.3,3.3-10.1.5c-1.3-1.3-1.5-2.1-2-2.3s-.4-.1-1.3.8l-5.8,5.8L71.3,89.2s1.6,1.9,3.1,1.9S77.6,89.1,77.6,89.1Z',
     'Chatbot': 'M58,16H56V11.7A6.1,6.1,0,0,0,59.7,4,6,6,0,1,0,48.3,8,6.2,6.2,0,0,0,52,11.7V16H28V11.7A6.1,6.1,0,0,0,31.7,4,6,6,0,0,0,20.3,8,6.2,6.2,0,0,0,24,11.7V16H22A10,10,0,0,0,12,26V58A10,10,0,0,0,22,68h6V78a2,2,0,0,0,2,2,1.7,1.7,0,0,0,1.2-.4L46.7,68H58A10,10,0,0,0,68,58V26A10,10,0,0,0,58,16ZM54.9,51.8a35.3,35.3,0,0,1-29.8,0,2,2,0,1,1,1.8-3.6c7.5,3.8,18.7,3.8,26.2,0a2,2,0,0,1,1.8,3.6ZM33.8,38.2H29.1V29.6h4.7Zm16,0H45.1V29.6h4.7ZM0,38v8a6,6,0,0,0,6,6H8V32H6A6,6,0,0,0,0,38Zm74-6H72V52h2a6,6,0,0,0,6-6V38A6,6,0,0,0,74,32Z',
@@ -29,10 +66,26 @@
 
   var nodeColors = {
     'Scene': '#f634a5',
+    'Page': '#f634a5',
     'User': '#bf975f',
     'Logic': '#8debd2',
     'Chatbot': '#643dff',
     'Universal': '#fff'
+  };
+
+  function createGroup(groupType) {
+    createGroupNode(groupType);
+  };
+
+  function addNode(category) {
+    let name = category;
+    diagram.model.commit(function (d) {
+      var data = diagram.model.nodeDataArray[0];
+      var node = diagram.findNodeForData(data);
+      addNodeToPlane(category, data?.key);
+    }, "reconnect link");
+
+
   };
 
   function getNodeShape(category) {
@@ -71,16 +124,117 @@
     if (!ok) e.diagram.currentTool.doCancel();
   };
 
+  function updateModel(val) {
+    // No GoJS transaction permitted when replacing Diagram.model.
+    if (val instanceof go.Model) {
+      diagram.model = val
+    } else {
+      let m = new go.GraphLinksModel()
+      if (val) {
+        for (let p in val) {
+          m[p] = val[p]
+        }
+      }
+      diagram.model = m
+    }
+  };
+
+  function addNodeToPlane(name, groupName) {
+
+    // console.log('Node Data Array --------------->', diagram.model.nodeDataArray);
+
+    // diagram.startTransaction("add group node");
+    // diagram.model.addNodeData(newnode);
+    // diagram.commitTransaction("add group node");
+
+    const nodeDataArray = diagram.model.nodeDataArray;
+    const groupNodesArray = diagram.model.nodeDataArray.filter(o => o.isGroup);
+    const groupNode = groupNodesArray[groupNodesArray.length - 1];
+    const node = nodeDataArray[nodeDataArray.length - 1];
+    console.log('last added node--------------->', node.key, groupNodesArray.length);
+    const newnode = {
+      // id: name,
+      key: name,
+      // title: name,
+      isGroup: false,
+      group: groupNode.key,
+      member: groupNode.key,
+      path: getNodeShape(name),
+      fig: 'Square',
+      color: getNodeColor(name),
+      width: 60,
+      height: 60,
+      margin: 4,
+    };
+    // const node = b.part.adornedPart;
+
+    // we are modifying the model, so conduct a transaction
+    // var diagram = node.diagram;
+    diagram.startTransaction("add node and link");
+    // have the Model add the node data
+    diagram.model.addNodeData(newnode);
+    // locate the node initially where the parent node is
+    // diagram.findNodeForData(newnode).location = node.location;
+    // and then add a link data connecting the original node with the new one
+    if (nodeDataArray.filter(o => o.member == groupNode.key).length > 1) {
+      const newlink = { from: node.key, to: newnode.key };
+      diagram.model.addLinkData(newlink);
+    }
+    // finish the transaction -- will automatically perform a layout
+    diagram.commitTransaction("add node and link");
+  }
+
+  function createGroupNode(name) {
+    const newnode = {
+      // id: name,
+      key: name,
+      // title: name,
+      isGroup: true,
+      horiz: true,
+      group: 'Group',
+      fig: 'Square',
+      // width: 60,
+      // height: 60,
+      // margin: 4,
+    };
+
+    diagram.startTransaction("add group node");
+    diagram.model.addNodeData(newnode);
+    diagram.commitTransaction("add group node");
+  };
+
+  function drawLink(e, button) {
+    let node = button.part.adornedPart
+    let tool = e.diagram.toolManager.linkingTool
+    tool.startObject = node.port
+    e.diagram.currentTool = tool
+    tool.doActivate()
+  };
+
 
   var $ = go.GraphObject.make;
 
   diagram.nodeTemplate =
     $(go.Node, "Auto",
-      new go.Binding("location", "loc", go.Point.parse),
+      {
+        linkConnected: function (node, link, port) {
+          if (link.fromNode !== null) link.fromNode.invalidateConnectedLinks()
+          if (link.toNode !== null) link.toNode.invalidateConnectedLinks()
+        },
+        linkDisconnected: function (node, link, port) {
+          if (link.fromNode !== null) link.fromNode.invalidateConnectedLinks()
+          if (link.toNode !== null) link.toNode.invalidateConnectedLinks()
+        },
+        locationSpot: go.Spot.Center
+      },
+      // new go.Binding("location", "loc", go.Point.parse),
+      new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
       // $(go.Shape, "Square", { width: 100, height: 100, margin: 4, fill: "white" }),
       $(go.Shape, "RoundedRectangle", {
         fill: '#000000',
-        margin: 4,
+        // margin: 4,
+        width: 300,
+        height: 300,
       },
         new go.Binding("figure", "fig"),
         new go.Binding("width", "width"),
@@ -94,7 +248,16 @@
           width: 25,
           height: 25,
           fill: '#000000',
-          margin: 4,
+          fromSpot: go.Spot.AllSides,
+          fromLinkable: true,
+          fromLinkableDuplicates: false,
+          fromLinkableSelfNode: false,
+          toSpot: go.Spot.AllSides,
+          toLinkable: true,
+          toLinkableDuplicates: false,
+          toLinkableSelfNode: false,
+          fill: '#191a1c',
+          // margin: 4,
           strokeWidth: 2
         },
         new go.Binding("fill", "color"),
@@ -105,6 +268,46 @@
         font: "Normal 8pt Sans-Serif",
       },
         new go.Binding("text", "key")),
+      {
+        selectionAdornmentTemplate:
+          $(go.Adornment, 'Spot',
+            $(go.Panel, 'Auto',
+              $(go.Shape, { stroke: 'red', strokeWidth: 1, fill: null }),
+              $(go.Placeholder)
+            ),
+            $(go.Panel, 'Vertical',
+              { alignment: go.Spot.Right, alignmentFocus: go.Spot.Left },
+              // $('Button',
+              //   { click: this.editText },  // defined below, to support editing the text of the node
+              //   $(go.TextBlock, 't',
+              //     { font: 'bold 10pt sans-serif', desiredSize: new go.Size(15, 15), textAlign: 'center' })
+              // ),
+              // $('Button',
+              //   { click: changeColor, '_buttonFillOver': 'transparent' },  // defined below, to support changing the color of the node
+              //   new go.Binding('ButtonBorder.fill', 'color', nextColor),
+              //   $(go.Shape,
+              //     { fill: null, stroke: null, desiredSize: new go.Size(14, 14) })
+              // ),
+              $('Button',
+                { // drawLink is defined below, to support interactively drawing new links
+                  click: drawLink,  // click on Button and then click on target node
+                  actionMove: drawLink  // drag from Button to the target node
+                },
+                $(go.Shape,
+                  { geometryString: 'M0 0 L8 0 8 12 14 12 M12 10 L14 12 12 14' })
+              )
+              // $('Button',
+              //   {
+              //     actionMove: dragNewNode,  // defined below, to support dragging from the button
+              //     _dragData: { text: 'a Node', color: 'lightgray' },  // node data to copy
+              //     click: clickNewNode  // defined below, to support a click on the button
+              //   },
+              //   $(go.Shape,
+              //     { geometryString: 'M0 0 L3 0 3 10 6 10 x F1 M6 6 L14 6 14 14 6 14z', fill: 'gray' })
+              // )
+            )
+          )
+      }
     );
 
   diagram.groupTemplate =
@@ -142,48 +345,25 @@
   diagram.layout = $(go.LayeredDigraphLayout,
     { layerSpacing: 20, isRealtime: false, });
 
+  diagram.linkTemplate =
+    $(go.Link,
+      { routing: go.Link.AvoidsNodes },
+      $(go.Shape),
+      $(go.Shape, { toArrow: "Standard" })
+    );
+
   const nodeDataArray = [
-    { key: "Logos(3P + 1L)", isGroup: true, horiz: true, },
-    { key: "Page 1", group: "Logos(3P + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Page 2", group: "Logos(3P + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Page 3", group: "Logos(3P + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Logic 1", group: "Logos(3P + 1L)", path: getNodeShape('Logic'), fig: 'Square', color: getNodeColor('Logic'), width: 60, height: 60, margin: 4, },
-    { key: "Page 4", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Page 5", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Page 6", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Page 7", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "3D navigation(5S + 1L)", isGroup: true, horiz: true, },
-    { key: "Scene 1", group: "3D navigation(5S + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 2", group: "3D navigation(5S + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 3", group: "3D navigation(5S + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 4", group: "3D navigation(5S + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 5", group: "3D navigation(5S + 1L)", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Logic 2", group: "3D navigation(5S + 1L)", path: getNodeShape('Logic'), fig: 'Square', color: getNodeColor('Logic'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 6", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 7", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 8", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
-    { key: "Scene 9", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
+    // { key: "Node", isGroup: true, horiz: true, },
+    // { key: "Page", group: "Node", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
+    // { key: "Logic", group: "Node", path: getNodeShape('Logic'), fig: 'Square', color: getNodeColor('Logic'), width: 60, height: 60, margin: 4, },
+    // { key: "Scene", group: "Node", path: getNodeShape('Scene'), fig: 'Square', color: getNodeColor('Scene'), width: 60, height: 60, margin: 4, },
   ];
   var linkDataArray = [
-    { from: "Page 1", to: "Page 2" },
-    { from: "Page 2", to: "Page 3" },
-    { from: "Page 3", to: "Logic 1" },
-    { from: "Logic 1", to: "Page 4" },
-    { from: "Logic 1", to: "Page 5" },
-    { from: "Page 4", to: "Page 6" },
-    { from: "Page 5", to: "Page 7" },
-    { from: "Page 6", to: "Scene 1" },
-    { from: "Page 7", to: "Scene 2" },
-    { from: "Scene 2", to: "Scene 3" },
-    { from: "Scene 2", to: "Scene 4" },
-    { from: "Scene 4", to: "Scene 5" },
-    { from: "Scene 5", to: "Logic 2" },
-    { from: "Logic 2", to: "Scene 6" },
-    { from: "Logic 2", to: "Scene 7" },
-    { from: "Scene 6", to: "Scene 8" },
-    { from: "Scene 7", to: "Scene 9" },
+    // { from: "Page", to: "Logic" },
+    // { from: "Logic", to: "Scene" },
   ];
-  diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+
+  // diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
 
 
 </script>
