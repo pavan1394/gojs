@@ -38,8 +38,8 @@
     <li onclick="createGroup('Test Group')"><a>Group</a></li>
     <!-- <li onclick="createGroup('Vertical')"><a>V-Group</a></li> -->
     <li onclick="addNode('Page')"><a>Page</a></li>
-    <li onclick="addNode('Scene')"><a>Scene</a></li>
     <li onclick="addNode('Logic')"><a>Logic</a></li>
+    <li onclick="addNode('Scene')"><a>Scene</a></li>
   </ul>
   <div id="myDiagramDiv" style="width:100vw; height:100vh">
   </div>
@@ -80,8 +80,10 @@
   function addNode(category) {
     let name = category;
     diagram.model.commit(function (d) {
-      addNodeToPlane(category);
-    }, "add node");
+      var data = diagram.model.nodeDataArray[0];
+      var node = diagram.findNodeForData(data);
+      addNodeToPlane(category, data?.key);
+    }, "reconnect link");
 
 
   };
@@ -137,20 +139,26 @@
     }
   };
 
-  function addNodeToPlane(name) {
+  function addNodeToPlane(name, groupName) {
+
+    // console.log('Node Data Array --------------->', diagram.model.nodeDataArray);
+
+    // diagram.startTransaction("add group node");
+    // diagram.model.addNodeData(newnode);
+    // diagram.commitTransaction("add group node");
 
     const nodeDataArray = diagram.model.nodeDataArray;
-    const groupNodesArray = nodeDataArray.filter(o => o.isGroup);
+    const groupNodesArray = diagram.model.nodeDataArray.filter(o => o.isGroup);
     const groupNode = groupNodesArray[groupNodesArray.length - 1];
-    const nodeDataArrayWithoutGroups = nodeDataArray.filter(o => !o.isGroup);
-    let node = nodeDataArray[nodeDataArray.length - 1];
-    node = node?.isGroup ? nodeDataArray[nodeDataArray.length - 2] : node;
-    const selnode = diagram.selection.first();
-
-    let newnode = {
+    const node = nodeDataArray[nodeDataArray.length - 1];
+    console.log('last added node--------------->', node.key, groupNodesArray.length);
+    const newnode = {
+      // id: name,
       key: name,
+      // title: name,
       isGroup: false,
-      ungroupable: true,
+      group: groupNode.key,
+      member: groupNode.key,
       path: getNodeShape(name),
       fig: 'Square',
       color: getNodeColor(name),
@@ -158,30 +166,21 @@
       height: 60,
       margin: 4,
     };
-    if (selnode && selnode?.data?.member !== groupNode?.key) {
-      newnode['group'] = selnode?.data?.member;
-      newnode['member'] = selnode?.data?.member;
-    } else {
-      if (groupNode) {
-        console.log('create new  node inside else if block------------->');
-        newnode['group'] = groupNode?.key;
-        newnode['member'] = groupNode?.key;
-      }
-    }
+    // const node = b.part.adornedPart;
 
+    // we are modifying the model, so conduct a transaction
+    // var diagram = node.diagram;
     diagram.startTransaction("add node and link");
     // have the Model add the node data
     diagram.model.addNodeData(newnode);
-    let newlink = {};
-    // if (groupNode && nodeDataArray.filter(o => o.member == groupNode?.key).length > 1) {
-    //   newlink = { from: selnode?.data?.key ? selnode?.data?.key : node?.key, to: newnode.key };
-    //   diagram.model.addLinkData(newlink);
-    // } else {
-      if (nodeDataArray.length > 1) {
-        newlink = { from: selnode?.data?.key ? selnode?.data?.key : node?.key, to: newnode.key };
-        diagram.model.addLinkData(newlink);
-      }
-    // }
+    // locate the node initially where the parent node is
+    // diagram.findNodeForData(newnode).location = node.location;
+    // and then add a link data connecting the original node with the new one
+    if (nodeDataArray.filter(o => o.member == groupNode.key).length > 1) {
+      const newlink = { from: node.key, to: newnode.key };
+      diagram.model.addLinkData(newlink);
+    }
+    // finish the transaction -- will automatically perform a layout
     diagram.commitTransaction("add node and link");
   }
 
@@ -339,7 +338,7 @@
             new go.Binding("text", "key")),
         ),
         $(go.Placeholder,     // represents area for all member parts
-          { padding: new go.Margin(10, 10), background: "white", padding: 20, alignment: go.Spot.TopLeft, })
+          { padding: new go.Margin(10, 10), background: "white", padding: 20, })
       )
     );
 
